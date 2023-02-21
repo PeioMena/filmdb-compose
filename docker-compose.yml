@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.8.3
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+    volumes:
+      - db-data:/var/lib/mysql
+    profiles: [ "develop", "production" ]
+
+  web-dev:
+    build: docker/app/
+    command: >
+      python run/manage.py runserver 0.0.0.0:8090
+    environment:
+      - MYSQL_HOST
+      - MYSQL_DATABASE
+      - MYSQL_PORT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    ports:
+      - 8090:8090
+    volumes:
+      - ./src:/app/src
+      - staticfiles:/app/static
+      - mediafiles:/app/media
+    depends_on:
+      db:
+        condition: service_started
+    profiles: [ "develop" ]
+
+  web-prod:
+    build: .
+    command: >
+      python run/manage.py runserver 0.0.0.0:8080
+    environment:
+      - MYSQL_HOST
+      - MYSQL_DATABASE
+      - MYSQL_PORT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    ports:
+      - 8080:8080
+    volumes:
+      - ./src:/app/src
+      - staticfiles:/app/static
+      - mediafiles:/app/media
+    depends_on:
+      db:
+        condition: service_started
+    profiles: [ "production" ]
+
+volumes:
+  db-data:
+  staticfiles:
+  mediafiles:

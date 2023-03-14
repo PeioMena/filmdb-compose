@@ -13,10 +13,39 @@ services:
       - db-data:/var/lib/mysql
     profiles: [ "develop", "production" ]
 
+  web-prod:
+    build:
+      context: .
+      dockerfile: ./docker/app/production/Dockerfile.prod
+    command: sh -c "cd src/filmdb && gunicorn filmdb.wsgi:application --bind 172.21.0.3:80"
+    volumes:
+      - staticfiles:/app/static
+      - mediafiles:/app/media
+    depends_on:
+      db:
+        condition: service_started
+    profiles: [ "production" ]
+
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - 8000:8000
+    volumes:
+      - staticfiles:/app/static
+      - mediafiles:/app/media
+    links:
+      - "web-prod:web-prod"
+    depends_on:
+      web-prod:
+        condition: service_started
+    profiles: [ "production" ]
+
   web-dev:
-    build: docker/app/
+    build:
+      context: .
+      dockerfile: ./docker/app/develop/Dockerfile.dev
     command: >
-      python run/manage.py runserver 0.0.0.0:8090
+      python bin/manage.py runserver 0.0.0.0:8090
     environment:
       - MYSQL_HOST
       - MYSQL_DATABASE
@@ -33,27 +62,6 @@ services:
       db:
         condition: service_started
     profiles: [ "develop" ]
-
-  web-prod:
-    build: .
-    command: >
-      python run/manage.py runserver 0.0.0.0:8080
-    environment:
-      - MYSQL_HOST
-      - MYSQL_DATABASE
-      - MYSQL_PORT
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-    ports:
-      - 8080:8080
-    volumes:
-      - ./src:/app/src
-      - staticfiles:/app/static
-      - mediafiles:/app/media
-    depends_on:
-      db:
-        condition: service_started
-    profiles: [ "production" ]
 
 volumes:
   db-data:

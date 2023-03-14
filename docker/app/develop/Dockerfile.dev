@@ -1,0 +1,22 @@
+FROM python:latest
+
+# remove this when uwsgi is required 
+# # This prevents Python from writing out pyc files
+# ENV PYTHONDONTWRITEBYTECODE=1
+# # This keeps Python from buffering stdin/stdout
+
+ENV PYTHONUNBUFFERED=1
+
+ENV APP_HOME=/app
+
+WORKDIR $APP_HOME
+RUN mkdir src bin
+COPY ./docker/app/develop/dev_requirements.txt $APP_HOME
+COPY ./docker/app/bin $APP_HOME/bin
+COPY ./src $APP_HOME/src
+
+RUN python -m pip install --upgrade pip 
+RUN pip install -r dev_requirements.txt
+
+
+ENTRYPOINT [ "./bin/entrypoint.sh" ]

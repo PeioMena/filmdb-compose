@@ -1,6 +1,4 @@
-# Error instaling uwsgi in alpine 
-
-FROM python:latest
+FROM python:3.10.10-alpine
 
 # remove this when uwsgi is required 
 # # This prevents Python from writing out pyc files
@@ -17,6 +15,13 @@ COPY ./docker/app/production/prod_requirements.txt $APP_HOME
 COPY ./docker/app/bin $APP_HOME/bin
 
 WORKDIR $APP_HOME/src
+
+RUN apk update 
+# mysqlclient instalazioan errorea kentzeko (alpine irudia bada)
+RUN apk add --virtual build-deps gcc python3-dev musl-dev 
+RUN apk add --no-cache mariadb-dev
+# git instalatu (alpine irudia bada)
+RUN apk add git
 RUN git clone https://oauth2:glpat-zDqyQZRrfbmQkqk-RCWo@gitlab.com/codesyntax/filmdb 
 
 WORKDIR $APP_HOME

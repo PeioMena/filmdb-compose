@@ -1,10 +1,9 @@
-FROM python:3.10.10-alpine
+FROM python:3.10.10-alpine 
 
 # remove this when uwsgi is required 
 # # This prevents Python from writing out pyc files
-# ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONDONTWRITEBYTECODE=1
 # # This keeps Python from buffering stdin/stdout
-
 ENV PYTHONUNBUFFERED=1
 
 ENV APP_HOME=/app

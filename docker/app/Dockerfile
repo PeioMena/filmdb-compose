@@ -9,7 +9,7 @@ ENV APP_HOME=/app
 
 WORKDIR $APP_HOME
 RUN mkdir src bin
-COPY ./docker/app/develop/dev_requirements.txt $APP_HOME
+COPY ./docker/app/requirements.txt $APP_HOME
 COPY ./docker/app/bin $APP_HOME/bin
 COPY ./src $APP_HOME/src
 
@@ -18,7 +18,7 @@ RUN apk update
 RUN apk add --virtual build-deps gcc python3-dev musl-dev 
 RUN apk add --no-cache mariadb-dev
 RUN python -m pip install --upgrade pip 
-RUN pip install -r dev_requirements.txt
+RUN pip install -r requirements.txt
 
 
 ENTRYPOINT [ "./bin/entrypoint.sh" ]

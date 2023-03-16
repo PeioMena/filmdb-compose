@@ -16,7 +16,7 @@ services:
   web-prod:
     build:
       context: .
-      dockerfile: ./docker/app/production/Dockerfile
+      dockerfile: ./docker/app/Dockerfile
     command: sh -c "cd src/filmdb && gunicorn filmdb.wsgi:application --bind web-prod:80"
     depends_on:
       db:
@@ -40,7 +40,7 @@ services:
   web-dev:
     build:
       context: .
-      dockerfile: ./docker/app/develop/Dockerfile
+      dockerfile: ./docker/app/Dockerfile
     command: >
       python bin/manage.py runserver 0.0.0.0:8090
     ports:
